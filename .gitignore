@@ -82,6 +82,9 @@ celerybeat-schedule
 venv/
 ENV/
 
+# recnet
+recnet/
+
 # Spyder project settings
 .spyderproject
 

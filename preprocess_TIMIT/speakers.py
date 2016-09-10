@@ -25,8 +25,8 @@ def get_speaker_lists(rootDir):
 
         len = region_speakers.__len__()
         valid_len = int(round(len * 0.1))
-        random_valid = np.random.random_integers(0,region_speakers.__len__()-1,valid_len)
-        random_train = np.delete(np.arange(0,region_speakers.__len__()),random_valid)
+        random_valid = np.random.randint(0,len-1,valid_len)
+        random_train = np.delete(np.arange(0,len),random_valid)
         region_speakers = np.asarray(region_speakers)
 
         train_speaker = train_speaker + list(region_speakers[random_train])

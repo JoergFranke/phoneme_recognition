@@ -3,7 +3,7 @@
 
 ######  GLOBAL THEANO CONFIG   #######
 import os
-t_flags = "mode=FAST_RUN,device=cpu,floatX=float32, optimizer='fast_run', allow_gc=False" #ast_run
+t_flags = "mode=FAST_RUN,device=gpu,floatX=float32, optimizer='fast_run', allow_gc=False" #ast_run
 print "Theano Flags: " + t_flags
 os.environ["THEANO_FLAGS"] = t_flags
 
@@ -15,8 +15,8 @@ import sklearn.metrics
 from collections import OrderedDict
 #import matplotlib.pyplot as plt
 
-from rnnfwk.build_model import rnnModel
-from rnnfwk.data_handler import load_minibatches
+from recnet.build_model import rnnModel
+from recnet.data_handler import load_minibatches
 
 
 ########## RANDOM STREAMS
