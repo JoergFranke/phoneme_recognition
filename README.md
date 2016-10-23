@@ -1,7 +1,7 @@
 # Phoneme Recognition using RecNet
 
 
-<!--- [![Build Status](https://travis-ci.org/joergfranke/rnnfwk.svg?branch=master)](https://travis-ci.org/joergfranke/rnnfwk) --->
+
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/joergfranke/phoneme_recognition/blob/master/LICENSE.txt)
 [![Python](https://img.shields.io/badge/python-2.7-yellow.svg)](https://www.python.org/download/releases/2.7/)
 
@@ -11,19 +11,19 @@ This repository contains a automated phoneme recognition based on a recurrent ne
 the [RecNet](https://github.com/joergfranke/recnet/) framework which is based on [Theano](http://deeplearning.net/software/theano/).
 The used speech data set is the [TIMIT Acoustic-Phonetic Continuous Speech Corpus](https://catalog.ldc.upenn.edu/ldc93s1).
 
-![alt tag](/images/example.png)
+![](/images/example.png)
 
 
 ## Requirements
 
-- Parts of the preprocess needs the SND file format library. For example it's installable via the APT interface.
+- The pre-process requires the SND file format library. It's installable via the APT interface.
 ```bash
 sudo apt-get install libsndfile-dev
 ```
-- This phoneme recognition model uses the rnnfwk RNN-Framework which needs to be installed. 
+- This phoneme recognition uses the [RecNet](https://github.com/joergfranke/recnet/) framework which needs to be installed.
 ```bash
-git clone https://github.com/joergfranke/rnnfwk.git
-cd rnnfwk
+git clone https://github.com/joergfranke/recnet.git
+cd recnet
 python setup.py install
 ```
 - There's a problem in 'scikits.audiolab's setup.py file.
@@ -33,11 +33,9 @@ Workaround: first install numpy, then requirements
 pip install -r requirements.txt
 ```
 
+## How to use it
 
-
-## How to use
-
-### Step 1: Make data set
+### Step 1: Make a feature/target data set
 
 This step contains the whole pre-process and creates a data set in the form of two lists, one with sequences of
 features (MFCC + log-energy + derivations) and one with corresponding sequences of targets (correct phonemes).
@@ -50,15 +48,15 @@ The data set gets stored in the klepto file format. Do the following for creatin
 
 ### Step 2: Train recurrent neural network model
 
-The second step contains the training of the model. Therefore it uses the [recnet](https://github.com/joergfranke/recnet/blob/master/README.md)
-framework with a deep bidirectional LSTM architecture. Do the following for training the model:
+The second step contains the training of the model. This phoneme recognition uses for instance gated recurrent units
+(GRU) with layer normalization. Do the following for training the model:
 
 1. Run `train_model.py`
-2. Find the log file in the log folder
+2. Find the log file of training in the log folder.
 
 ### Step 3: Evaluate exercised model
 
-At least the traind model gets evaluated on the test set. The log loss and the rate of correct detected phonemes gets calculated.
+At least the exercised model gets evaluated on the test set. The log loss and the rate of correct detected phonemes will calculated.
 A plot shows the input features, the true and the predicted phonemes.
 
 1. Run `evaluate_model.py`
