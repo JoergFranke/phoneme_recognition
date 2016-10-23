@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 __author__ = 'joerg'
 
-""" Phonem Classification on the TIMIT speech corpus with Theano based DBLSTM Network """
-"""___________________________________________________________________________________"""
+""" Phonem Classification on the TIMIT speech corpus with RecNet framework based on Theano """
+"""________________________________________________________________________________________"""
 """
 """
 
@@ -14,30 +14,13 @@ print "Theano Flags: " + t_flags
 os.environ["THEANO_FLAGS"] = t_flags
 
 ######         IMPORTS          ######
-import theano
-#theano.config.device='gpu0'
-#theano.config.floatX = 'float32'
-#theano.config.mode = 'FAST_RUN'
-#theano.config.optimizer = 'fast_run'
-#theano.config.allow_gc = False
-
-#theano.config.lib.cnmem =1
-theano.config.scan.allow_gc = False
-#theano.config.optimizer_excluding ='low_memory'
-#theano.config.scan.allow_output_prealloc = True
-#theano.config.exception_verbosity='high'
-
-
 import numpy as np
 import sklearn.metrics
 from scipy import stats
 import time
 from collections import OrderedDict
 
-
-
-
-from recnet.recnet.build_model import rnnModel
+from recnet.build_model import rnnModel
 
 
 # ### 1. Step: Define parameters
@@ -49,7 +32,6 @@ parameter["train_data_name"] = "timit_train_xy_mfcc12-26win25-10.klepto"
 parameter["valid_data_name"] = "timit_valid_xy_mfcc12-26win25-10.klepto"
 parameter["data_location"] = "data_set/"
 parameter["batch_size" ] = 10
-parameter["mini_batch_location"] = "mini_batch/"
 
 parameter["net_size"      ] = [     26,      218,        61]
 parameter["net_unit_type" ] = ['input', 'GRU_ln', 'softmax']
@@ -58,19 +40,8 @@ parameter["net_arch"      ] = [    '-',     'bi',      'ff']
 
 parameter["random_seed"   ] = 211
 parameter["epochs"        ] = 20
-parameter["learn_rate"    ] = 0.0001
-parameter["momentum_rate" ] = 0.9
-parameter["decay_rate"    ] = 0.9
-parameter["use_dropout"   ] = False       # False, True
-parameter["dropout_level" ] = 0.5
-parameter["regularization"] = False       # False, L2, ( L1 )
-parameter["reg_factor"    ] = 0.01
 parameter["optimization"  ] = "adadelta"  # sgd, nm_rmsprop, rmsprop, nesterov_momentum, adadelta
-parameter["noisy_input"   ] = False       # False, True
-parameter["noise_level"   ] = 0.6
-parameter["loss_function" ] = "cross_entropy" # w2_cross_entropy, cross_entropy
-parameter["bound_weight"  ] = False       # False, Integer (2,12)
-
+parameter["loss_function" ] = "cross_entropy"
 
 
 ### 2. Step: Create new model
@@ -81,20 +52,15 @@ model = rnnModel(parameter)
 train_fn    = model.get_training_function()
 valid_fn    = model.get_validation_function()
 
+
 ### 4. Step: Train model
 model.pub("Start training")
 
-### 4.1: Create minibatches for validation set
 model.mbh.create_mini_batches("valid")
 valid_mb_set_x, valid_mb_set_y, valid_mb_set_m = model.mbh.load_mini_batches("valid")
 
-
-
 #save measurements
 list_ce = []
-
-
-
 
 for i in xrange(model.prm.optimize["epochs"]):
     time_training_start = time.time()
@@ -102,13 +68,10 @@ for i in xrange(model.prm.optimize["epochs"]):
     model.pub("------------------------------------------")
     model.pub(str(i)+" Epoch, Training run")
 
-
     train_error = np.zeros(model.prm.data["train_set_len" ])
 
     model.mbh.create_mini_batches("train")
     mb_train_x, mb_train_y, mb_mask = model.mbh.load_mini_batches("train")
-
-
 
     for j in xrange(model.prm.data["train_batch_quantity"]):
 
@@ -159,7 +122,6 @@ for i in xrange(model.prm.optimize["epochs"]):
     model.pub("Insample Error: " + str(np.mean(train_error)))
     model.pub("Epoch training duration: "+ str(time.time()-time_training_start) + "sec")
 
-#Finale Test
 model.pub("## ||||||||||||||||||||||||||||||||||||||||")
 
 

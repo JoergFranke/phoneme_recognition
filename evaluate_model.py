@@ -1,5 +1,5 @@
-
-
+#!/usr/bin/env python
+__author__ = 'joerg'
 
 ######  GLOBAL THEANO CONFIG   #######
 import os
@@ -13,12 +13,7 @@ import numpy as np
 import sklearn.metrics
 from collections import OrderedDict
 import matplotlib.pyplot as plt
-
-
-
-from recnet.recnet.build_model import rnnModel
-#from recnet.build_model import rnnModel
-
+from recnet.build_model import rnnModel
 
 
 ### 1. Step: Define parameters
@@ -27,13 +22,10 @@ parameter["load_model"] = True
 parameter["model_location"] = "model_save/"
 ################################################################################
 ########################### ADD NAME FROM TRAINED MODEL HERE ! #################
-#parameter["model_name"] = "**********************************.prm"
-parameter["model_name"] = "GRU_ln-softmax_26-218-61_bi_d-21-10-2016_v-1.prm"
+parameter["model_name"] = "**********************************.prm"
 parameter["batch_size" ] = 5
 parameter["data_location"] = "data_set/"
 parameter["test_data_name"] = "timit_test_xy_mfcc12-26win25-10.klepto"
-
-
 
 
 ### 2. Step: Build model and get a forward function
@@ -45,8 +37,7 @@ forward_fn = model.get_forward_function()
 test_mb_set_x, test_mb_set_y, test_mb_set_m = model.get_mini_batches("test")
 
 
-
-###### TEST MODEL
+### 4. Step: Test model
 ce_error = np.zeros([model.get_samples_quantity('test')])
 phn_error = np.zeros([model.get_samples_quantity('test')])
 
@@ -62,10 +53,11 @@ for v in np.arange(0, model.get_batches_quantity('test')):
         phn_error[count] = np.mean(np.argmax(true_out, axis=1) == np.argmax(code_out, axis=1))
         ce_error[count] = sklearn.metrics.log_loss(true_out, code_out)
 
-
 print("## cross entropy sklearn : " + "{0:.4f}".format(np.mean(ce_error)))
 print("## phoneme error rate    : " + "{0:.4f}".format(1 - np.mean(phn_error)))
 
+
+### 5. Step: Make a sample plot
 sample = 1
 batch = 1
 

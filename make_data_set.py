@@ -16,8 +16,7 @@ from preprocess_TIMIT.speakers import get_speaker_lists
 #########################################################
 ###             Add path to TIMIT corpus              ###
 #########################################################
-#rootDir = "/path/to/TIMIT/"
-rootDir = "/media/joerg/hddred/development/datasets/TIMIT/"
+rootDir = "/path/to/TIMIT/"
 
 
 # Location of the target data set folder
