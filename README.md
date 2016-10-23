@@ -11,7 +11,7 @@ This repository contains a automated phoneme recognition based on a recurrent ne
 the [RecNet](https://github.com/joergfranke/recnet/) framework which is based on [Theano](http://deeplearning.net/software/theano/).
 The used speech data set is the [TIMIT Acoustic-Phonetic Continuous Speech Corpus](https://catalog.ldc.upenn.edu/ldc93s1).
 
-![alt tag](/example.png)
+![alt tag](/images/example.png)
 
 
 ## Requirements
