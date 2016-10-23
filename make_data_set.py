@@ -18,6 +18,10 @@ from preprocess_TIMIT.speakers import get_speaker_lists
 #########################################################
 rootDir = "/path/to/TIMIT/"
 
+if "TEST/" in os.listdir(rootDir):
+    raise Warning("TIMIT TEST data is missing")
+if "TRAIN/" in os.listdir(rootDir):
+    raise Warning("TIMIT TRAIN data is missing")
 
 # Location of the target data set folder
 drainDir = "data_set/"
