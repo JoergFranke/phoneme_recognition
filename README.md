@@ -20,18 +20,20 @@ The used speech data set is the [TIMIT Acoustic-Phonetic Continuous Speech Corpu
 ```bash
 sudo apt-get install libsndfile-dev
 ```
+- There's a problem in 'scikits.audiolab's setup.py file.
+Workaround: first update pip, second install numpy, then requirements
+- Furthermore the model requires the packages listed in the `requirements.txt`.
+```bash
+pip install -r requirements.txt
+```
 - This phoneme recognition uses the [RecNet](https://github.com/joergfranke/recnet/) framework which needs to be installed.
 ```bash
 git clone https://github.com/joergfranke/recnet.git
 cd recnet
 python setup.py install
 ```
-- There's a problem in 'scikits.audiolab's setup.py file.
-Workaround: first install numpy, then requirements
-- Furthermore the model requires the packages listed in the `requirements.txt`.
-```bash
-pip install -r requirements.txt
-```
+
+*Please find a proposal for setup phoneme recognition in [setup.sh](https://github.com/joergfranke/phoneme_recognition/blob/master/setup.sh)*
 
 ## How to use it
 

@@ -10,3 +10,4 @@ six
 sklearn
 Theano==0.8.2
 scikits.audiolab
+matplotlib
