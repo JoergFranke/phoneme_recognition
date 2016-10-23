@@ -1,14 +1,22 @@
-# Phoneme Recognition using Deep Bidirectional LSTMs
+# Phoneme Recognition using RecNet
 
 
 <!--- [![Build Status](https://travis-ci.org/joergfranke/rnnfwk.svg?branch=master)](https://travis-ci.org/joergfranke/rnnfwk) --->
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/joergfranke/phoneme_recognition/blob/master/LICENSE.txt)
 [![Python](https://img.shields.io/badge/python-2.7-yellow.svg)](https://www.python.org/download/releases/2.7/)
-[![Theano](https://img.shields.io/badge/theano-0.8.2-yellow.svg)](http://deeplearning.net/software/theano/)
 
-## About
-This repository contains a phoneme recognition based on a Deep Bidirectional Long Short Term Memory network.
 
+
+This repository contains a automated phoneme recognition based on a recurrent neural network. The implementation uses
+the [RecNet](https://github.com/joergfranke/recnet/) framework which is based on [Theano](http://deeplearning.net/software/theano/).
+The used speech data set is the [TIMIT Acoustic-Phonetic Continuous Speech Corpus](https://catalog.ldc.upenn.edu/ldc93s1).
+
+
+<table>
+  <tr>
+    <td><img src="example.png" ></td>
+  </tr>
+</table>
 
 ## Requirements
 
@@ -22,6 +30,8 @@ git clone https://github.com/joergfranke/rnnfwk.git
 cd rnnfwk
 python setup.py install
 ```
+- There's a problem in 'scikits.audiolab's setup.py file.
+Workaround: first install numpy, then requirements
 - Furthermore the model requires the packages listed in the `requirements.txt`.
 ```bash
 pip install -r requirements.txt
@@ -33,8 +43,10 @@ pip install -r requirements.txt
 
 ### Step 1: Make data set
 
-This step contains the whole preprocess and creates a data set in the form of two lists, one with sequences of features
-and one with corresponding sequences of targets. The data set gets stored in the klepto file format. Do the following for creating the data set:
+This step contains the whole pre-process and creates a data set in the form of two lists, one with sequences of
+features (MFCC + log-energy + derivations) and one with corresponding sequences of targets (correct phonemes).
+This pre-process is orientated on [Graves and Schmidhuber, 2005 ](ftp://ftp.idsia.ch/pub/juergen/nn_2005.pdf).
+The data set gets stored in the klepto file format. Do the following for creating the data set:
 
 1. Add path to the TIMIT corpus
 2. Run `make_data_set.py`

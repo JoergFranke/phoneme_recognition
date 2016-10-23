@@ -28,8 +28,8 @@ def get_features(filename, numcep, numfilt, winlen, winstep, grad):
     log_energy = np.log(energy) #np.log( np.sum(feat_raw**2, axis=1) )
     log_energy = log_energy.reshape([log_energy.shape[0],1])
 
-    #concatenate mfcc and log energy
-    mat = np.concatenate((feat,log_energy),axis=1)
+    mat = ( feat - np.mean(feat, axis=0) ) / (0.5 * np.std(feat, axis=0))
+    mat = np.concatenate((mat, log_energy), axis=1)
 
     #calc first order derivatives
     if grad >= 1:
@@ -40,9 +40,6 @@ def get_features(filename, numcep, numfilt, winlen, winstep, grad):
     if grad == 2:
         grad2f = np.gradient(gradf)[0]
         mat = np.concatenate((mat, grad2f), axis=1)
-
-    #normilize signals
-    mat = ( mat - np.mean(mat, axis=0) ) / np.std(mat, axis=0)
 
     return mat, frames, samplerate
 
