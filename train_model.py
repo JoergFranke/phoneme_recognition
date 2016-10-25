@@ -55,9 +55,7 @@ valid_fn    = model.get_validation_function()
 
 ### 4. Step: Train model
 model.pub("Start training")
-
-model.mbh.create_mini_batches("valid")
-valid_mb_set_x, valid_mb_set_y, valid_mb_set_m = model.mbh.load_mini_batches("valid")
+valid_mb_set_x, valid_mb_set_y, valid_mb_set_m = model.get_mini_batches("valid")
 
 #save measurements
 list_ce = []
@@ -70,8 +68,7 @@ for i in xrange(model.prm.optimize["epochs"]):
 
     train_error = np.zeros(model.prm.data["train_set_len" ])
 
-    model.mbh.create_mini_batches("train")
-    mb_train_x, mb_train_y, mb_mask = model.mbh.load_mini_batches("train")
+    mb_train_x, mb_train_y, mb_mask = model.get_mini_batches("train")
 
     for j in xrange(model.prm.data["train_batch_quantity"]):
 
