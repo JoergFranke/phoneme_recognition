@@ -18,87 +18,80 @@ import numpy as np
 import sklearn.metrics
 from scipy import stats
 import time
-from collections import OrderedDict
-
-from recnet.build_model import rnnModel
+import recnet
 
 
-# ### 1. Step: Define parameters
-parameter = OrderedDict()
-parameter["output_location"] = "log/"
-parameter["output_type"    ] = "both"        # console, file, both
+### 1. Step: Create new model
+rn = recnet.rnnModel()
 
-parameter["train_data_name"] = "timit_train_xy_mfcc12-26win25-10.klepto"
-parameter["valid_data_name"] = "timit_valid_xy_mfcc12-26win25-10.klepto"
-parameter["data_location"] = "data_set/"
-parameter["batch_size" ] = 10
+### 2. Step: Define parameters
+rn.parameter["output_location"] = "log/"
+rn.parameter["output_type"    ] = "both"        # console, file, both
 
-parameter["net_size"      ] = [     26,      218,        61]
-parameter["net_unit_type" ] = ['input', 'GRU_ln', 'softmax']
-parameter["net_act_type"  ] = [    '-',   'tanh',       '-']
-parameter["net_arch"      ] = [    '-',     'bi',      'ff']
+rn.parameter["train_data_name"] = "timit_train_xy_mfcc12-26win25-10.klepto"
+rn.parameter["valid_data_name"] = "timit_valid_xy_mfcc12-26win25-10.klepto"
+rn.parameter["data_location"] = "data_set/"
+rn.parameter["batch_size" ] = 10
 
-parameter["random_seed"   ] = 211
-parameter["epochs"        ] = 20
-parameter["optimization"  ] = "adadelta"  # sgd, nm_rmsprop, rmsprop, nesterov_momentum, adadelta
-parameter["loss_function" ] = "cross_entropy"
+rn.parameter["net_size"      ] = [     26,      218,        61]
+rn.parameter["net_unit_type" ] = ['input', 'GRU_ln', 'softmax']
+rn.parameter["net_act_type"  ] = [    '-',   'tanh',       '-']
+rn.parameter["net_arch"      ] = [    '-',     'bi',      'ff']
 
-
-### 2. Step: Create new model
-model = rnnModel(parameter)
+rn.parameter["random_seed"   ] = 211
+rn.parameter["epochs"        ] = 20
+rn.parameter["optimization"  ] = "adadelta"
+rn.parameter["loss_function" ] = "cross_entropy"
 
 
-### 3. Step: Build model functions
-train_fn    = model.get_training_function()
-valid_fn    = model.get_validation_function()
-
+### 3. Step: Create model and compile functions
+rn.create(['train', 'valid'])
 
 ### 4. Step: Train model
-model.pub("Start training")
-valid_mb_set_x, valid_mb_set_y, valid_mb_set_m = model.get_mini_batches("valid")
+rn.pub("Start training")
+
+### 4.1: Create minibatches for validation set
+mb_valid_x, mb_valid_y, mb_valid_m = rn.get_mini_batches("valid")
 
 #save measurements
 list_ce = []
 
-for i in xrange(model.prm.optimize["epochs"]):
+for i in xrange(rn.prm.optimize["epochs"]):
     time_training_start = time.time()
     time_training_temp = time.time()
-    model.pub("------------------------------------------")
-    model.pub(str(i)+" Epoch, Training run")
+    rn.pub("------------------------------------------")
+    rn.pub(str(i)+" Epoch, Training run")
 
-    train_error = np.zeros(model.prm.data["train_set_len" ])
+    train_error = np.zeros(rn.sample_quantity('train'))
 
-    mb_train_x, mb_train_y, mb_mask = model.get_mini_batches("train")
+    mb_train_x, mb_train_y, mb_mask = rn.get_mini_batches("train")
 
-    for j in xrange(model.prm.data["train_batch_quantity"]):
+    for j in xrange(rn.batch_quantity('train')):
 
-        net_out, train_error[j] = train_fn( mb_train_x[j],
-                                            mb_train_y[j],
-                                            mb_mask[j]
-                                            )
+        net_out, train_error[j] = rn.train_fn( mb_train_x[j], mb_train_y[j], mb_mask[j])
 
 
         #Insample error
         if ( j%50) == 0 :
-            model.pub("counter: " + "{:3.0f}".format(j)
+            rn.pub("counter: " + "{:3.0f}".format(j)
                    + "  time: " + "{:5.2f}".format(time.time()-time_training_temp) + "sec"
                    + "  error: " + "{:6.4f}".format(train_error[j]))
             time_training_temp = time.time()
 
         #Validation
-        if ( (j%500) == 0 or j == model.prm.data["train_batch_quantity" ]-1 ) and j>0:
-            model.pub("###########################################")
-            model.pub("## epoch validation at " + str(i) + "/" + str(j))
+        if ( (j%500) == 0 or j == rn.batch_quantity('train')-1 ) and j>0:
+            rn.pub("###########################################")
+            rn.pub("## epoch validation at " + str(i) + "/" + str(j))
 
-            v_error = np.zeros([model.prm.data["valid_batch_quantity"]])
-            corr_error = np.zeros([model.prm.data["valid_batch_quantity"],model.prm.data["batch_size"]])
-            ce_error = np.zeros([model.prm.data["valid_batch_quantity"],model.prm.data["batch_size"]])
+            v_error = np.zeros([rn.batch_quantity('valid')])
+            corr_error = np.zeros([rn.batch_quantity('valid'),rn.batch_size()])
+            ce_error = np.zeros([rn.batch_quantity('valid'),rn.batch_size()])
 
-            for v in np.arange(0,model.prm.data["valid_batch_quantity"]):
-                v_net_out_, v_error[v] = valid_fn(valid_mb_set_x[v],valid_mb_set_y[v],valid_mb_set_m[v])
+            for v in np.arange(0,rn.batch_quantity('valid')):
+                v_net_out_, v_error[v] = rn.valid_fn(mb_valid_x[v],mb_valid_y[v],mb_valid_m[v])
 
-                for b in np.arange(0,model.prm.data["batch_size"]):
-                    true_out = valid_mb_set_y[v][:,b,:]
+                for b in np.arange(0,rn.batch_size()):
+                    true_out = mb_valid_y[v][:,b,:]
                     code_out = v_net_out_[:,b,:]
                     corr_error[v,b] = np.mean(np.argmax(true_out,axis=1)==np.argmax(code_out, axis=1))
                     ce_error[v,b] = sklearn.metrics.log_loss( true_out,code_out)
@@ -108,17 +101,17 @@ for i in xrange(model.prm.optimize["epochs"]):
             array_ce = np.asarray(list_ce[-3:])
             ce_slope, intercept, r_value, p_value, std_err = stats.linregress(range(array_ce.shape[0]),array_ce)
 
-            model.pub("## cross entropy theano  : " + "{0:.4f}".format(np.mean(v_error)))
-            model.pub("## cross entropy sklearn : " + "{0:.4f}".format(np.mean(ce_error)))
-            model.pub("## correct classified    : " + "{0:.4f}".format(np.mean(corr_error)))
-            model.pub("## ce improve      : " + "{0:.6f}".format(ce_slope))
-            model.pub("###########################################")
+            rn.pub("## cross entropy theano  : " + "{0:.4f}".format(np.mean(v_error)))
+            rn.pub("## cross entropy sklearn : " + "{0:.4f}".format(np.mean(ce_error)))
+            rn.pub("## correct classified    : " + "{0:.4f}".format(np.mean(corr_error)))
+            rn.pub("## ce improve      : " + "{0:.6f}".format(ce_slope))
+            rn.pub("###########################################")
 
-            model.dump()
-    model.pub("###########################################")
-    model.pub("Insample Error: " + str(np.mean(train_error)))
-    model.pub("Epoch training duration: "+ str(time.time()-time_training_start) + "sec")
+            rn.dump()
+    rn.pub("###########################################")
+    rn.pub("Insample Error: " + str(np.mean(train_error)))
+    rn.pub("Epoch training duration: "+ str(time.time()-time_training_start) + "sec")
 
-model.pub("## ||||||||||||||||||||||||||||||||||||||||")
+rn.pub("## ||||||||||||||||||||||||||||||||||||||||")
 
 
