@@ -20,7 +20,7 @@ def get_timit_dict(dic_location):
     return dict_timit
 
 
-def get_target(phn_location,dict_timit, nframes, input_size):
+def get_target(phn_location,dict_timit, input_size):
 
 
     phn_file = open(phn_location, 'r')
@@ -29,40 +29,35 @@ def get_target(phn_location,dict_timit, nframes, input_size):
 
     phn_position_length = phn_position.__len__() -1
 
-    #input_size = int(nframes / float(sample_rate) / float(winstep))
-    window_factor = float(nframes) / input_size
+
 
     target = np.empty([input_size,61])
-    #target_raw = []
 
     #get first phonem
     phn_count = 0
     low_bound, hight_bound, symbol = phn_position[phn_count].split(" ")
-    low_bound = int(low_bound)
     hight_bound = int(hight_bound)
+    hight_bound_ms = hight_bound * 0.0625
     symbol = symbol.rstrip()
 
     #go step by step through target vector and add phonem vector
     for i in xrange(input_size):
-        threshold =  i * window_factor
-        if hight_bound > threshold:
+        threshold =  16 + i * 10
+        if hight_bound_ms > threshold:
             tarray = np.zeros(61)
             tarray[dict_timit[symbol]] = 1
             target[i] = tarray
-            #target_raw.append(symbol+" "+str(int(threshold)))
         else:
             #get next phonem
             phn_count = min(phn_count+1, phn_position_length)
             low_bound, hight_bound, symbol = phn_position[phn_count].split(" ")
-            low_bound = int(low_bound)
             hight_bound = int(hight_bound)
+            hight_bound_ms = hight_bound * 0.0625
             symbol = symbol.rstrip()
 
             tarray = np.zeros(61)
             tarray[dict_timit[symbol]] = 1
             target[i] = tarray
-            #target[i] = dict_timit[symbol]
-            #target_raw.append(symbol+" "+str(int(threshold)))
 
     return target
 

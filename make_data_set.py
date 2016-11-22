@@ -39,7 +39,7 @@ numfilt =26 #40
 winlen = 0.025
 # the step between successive windows in seconds. Default is 0.01s (10 milliseconds)
 winstep = 0.01
-# use  one or second order derivation
+# use  first or first+second order derivation
 grad = 1
 
 para_name = "mfcc" + str(numcep) + "-" + str(numfilt) + "win" + str(int(winlen*1000)) + "-" +str(int(winstep*1000))
@@ -77,7 +77,7 @@ for d in dirlist:
                     feat, frames, samplerate = get_features(wav_location, numcep, numfilt, winlen, winstep, grad)
                     print(feat.shape)
                     input_size = feat.shape[0]
-                    target = get_target(phn_location,timit_dict, frames, input_size)
+                    target = get_target(phn_location,timit_dict, input_size)
                     if folder_name in train_speaker:
                         train_set_x.append(feat)
                         train_set_y.append(target)
@@ -131,7 +131,7 @@ for d in dirlist:
                     feat, frames, samplerate = get_features(wav_location, numcep, numfilt, winlen, winstep, grad)
                     print(feat.shape)
                     input_size = feat.shape[0]
-                    target = get_target(phn_location,timit_dict, frames, input_size)
+                    target = get_target(phn_location,timit_dict, input_size)
                     test_set_x.append(feat)
                     test_set_y.append(target)
 
